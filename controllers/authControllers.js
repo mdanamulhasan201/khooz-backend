@@ -3,9 +3,10 @@ const adminModal = require("../models/adminModal");
 const sellerModal = require("../models/sellerModal");
 const sellerCustomerModal = require("../models/chat/SellerCustomerModal");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const { responseReturn } = require("../utiles/response");
 const { createToken } = require("../utiles/createToken");
+const formidable = require("formidable");
+const cloudinary = require("cloudinary").v2;
 
 class authControllers {
   // admin login
@@ -71,8 +72,6 @@ class authControllers {
     }
   };
 
-
-
   // seller login
 
   seller_login = async (req, res) => {
@@ -117,6 +116,65 @@ class authControllers {
         const seller = await sellerModal.findById(id);
         responseReturn(res, 200, { userInfo: seller });
       }
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
+  profile_image_upload = async (req, res) => {
+    const { id } = req;
+    const form = formidable({ multiples: true });
+    form.parse(req, async (err, _, files) => {
+      cloudinary.config({
+        cloud_name: process.env.cloud_name,
+        api_key: process.env.api_key,
+        api_secret: process.env.api_secret,
+        secure: true,
+      });
+      const { image } = files;
+      try {
+        const result = await cloudinary.uploader.upload(image.filepath, {
+          folder: "profile",
+        });
+        if (result) {
+          await sellerModal.findByIdAndUpdate(id, {
+            image: result.url,
+          });
+          const userInfo = await sellerModal.findById(id);
+          responseReturn(res, 201, {
+            message: "image upload success",
+            userInfo,
+          });
+        } else {
+          responseReturn(res, 404, { error: "image upload failed" });
+        }
+      } catch (error) {
+        responseReturn(res, 500, { error: error.message });
+      }
+    });
+  };
+
+  profile_info_add = async (req, res) => {
+    const { shopName, mobileNumber, division, district, thana, village } =
+      req.body;
+    const { id } = req;
+
+    try {
+      await sellerModal.findByIdAndUpdate(id, {
+        shopInfo: {
+          shopName,
+          mobileNumber,
+          division,
+          district,
+          thana,
+          village,
+        },
+      });
+      const userInfo = await sellerModal.findById(id);
+      responseReturn(res, 201, {
+        message: "profile info add success",
+        userInfo,
+      });
     } catch (error) {
       responseReturn(res, 500, { error: error.message });
     }
