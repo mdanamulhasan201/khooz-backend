@@ -77,21 +77,58 @@ class productController {
           $text: { $search: searchValue },
           sellerId: id,
         });
-        const totalProduct = await productModal.find({
-          $text: { $search: searchValue },
-          sellerId: id,
-        }).countDocuments()
-        responseReturn(res, 200, {totalProduct , products });
+        const totalProduct = await productModal
+          .find({
+            $text: { $search: searchValue },
+            sellerId: id,
+          })
+          .countDocuments();
+        responseReturn(res, 200, { totalProduct, products });
       } else {
         // If searchValue is not provided, return all products for the seller
         const products = await productModal.find({});
-        const totalProduct = await productModal.find({}).countDocuments()
+        const totalProduct = await productModal.find({}).countDocuments();
         responseReturn(res, 200, { products, totalProduct });
       }
     } catch (error) {
       console.log(error.message);
       // Handle any errors that may occur during the search
       responseReturn(res, 500, { error: "Internal server error" });
+    }
+  };
+
+  // product get (edit product in sellers )
+  product_get = async (req, res) => {
+    const { productId } = req.params;
+    try {
+      const product = await productModal.findById(productId);
+      responseReturn(res, 200, { product });
+    } catch (error) {
+      responseReturn(res, 500, { message: error.message });
+    }
+  };
+  // product update (update product in sellers )
+  product_update = async (req, res) => {
+    let { name, description, discount, price, brand, productId, stock } =
+      req.body;
+      
+    name = name.trim();
+    const slug = name.split(" ").join("-");
+    try {
+      await productModal.findByIdAndUpdate(productId, {
+        name,
+        description,
+        discount,
+        price,
+        brand,
+        productId,
+        stock,
+        slug,
+      });
+      const product = await productModal.findById(productId);
+      responseReturn(res, 200, { product, message: "product update success" });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
     }
   };
 }
