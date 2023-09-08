@@ -11,7 +11,7 @@ const cloudinary = require("cloudinary").v2;
 class authControllers {
   // admin login
   admin_login = async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     const { email, password } = req.body; //distructer
     try {
       const admin = await adminModal.findOne({ email }).select("+password");
@@ -75,7 +75,7 @@ class authControllers {
   // seller login
 
   seller_login = async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     const { email, password } = req.body; //distructer
     try {
       const seller = await sellerModal.findOne({ email }).select("+password");
