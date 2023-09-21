@@ -34,7 +34,7 @@ class sellerController {
   //   seller status update
   seller_status_update = async (req, res) => {
     const { sellerId, status } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
     try {
       await sellerModal.findByIdAndUpdate(sellerId, {
         status,
