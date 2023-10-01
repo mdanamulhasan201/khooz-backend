@@ -43,6 +43,32 @@ class homeControllers {
     }
   };
 
+  get_product_details = async (req, res) => {
+    const { slug } = req.params;
+    try {
+      const product = await productModal.findOne({ slug });
+      const moreProducts = await productModal
+        .find({
+          $and: [
+            {
+              _id: {
+                $ne: product.id,
+              },
+            },
+            {
+              sellerId: {
+                $eq: product.sellerId,
+              },
+            },
+          ],
+        })
+        .limit(3);
+      responseReturn(res, 200, { product, moreProducts });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   price_range_product = async (req, res) => {
     try {
       const priceRange = {
@@ -71,7 +97,7 @@ class homeControllers {
   query_products = async (req, res) => {
     const parPage = 12;
     req.query.parPage = parPage;
-    
+
     try {
       const products = await productModal.find({}).sort({
         createdAt: -1,

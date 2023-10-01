@@ -223,6 +223,7 @@ class cartControllers {
       responseReturn(res, 200, {
         message: "Remove wishlist",
         wishlistId,
+        wishlist
       });
     } catch (error) {
       console.log(error.message);
