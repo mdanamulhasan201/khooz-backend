@@ -2,6 +2,8 @@ const categoryModal = require("../../models/categoryModal");
 const productModal = require("../../models/productModal");
 const { responseReturn } = require("../../utiles/response");
 const queryProducts = require("../../utiles/queryProducts");
+const reviewModal = require("../../models/reviewModal");
+const moment = require("moment/moment");
 
 class homeControllers {
   get_categorys = async (req, res) => {
@@ -123,6 +125,39 @@ class homeControllers {
         totalProduct,
         parPage,
       });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  // review products
+
+  customer_review = async (req, res) => {
+    const { name, rating, review, productId } = req.body;
+    try {
+      await reviewModal.create({
+        productId,
+        name,
+        rating,
+        review,
+        date: moment(Date.now()).format("LL"),
+      });
+
+      
+
+      let rat = 0;
+      const reviews = await reviewModal.find({ productId });
+      for (let i = 0; i < reviews.length; i++) {
+        rat = rat + reviews[i].rating;
+      }
+      let productRating = 0;
+      if (review.length !== 0) {
+        productRating = (rat / reviews.length).toFixed(1);
+      }
+      await productModal.findByIdAndUpdate(productId, {
+        rating: productRating,
+      });
+      responseReturn(res, 201, { message: "Review Success" });
     } catch (error) {
       console.log(error.message);
     }

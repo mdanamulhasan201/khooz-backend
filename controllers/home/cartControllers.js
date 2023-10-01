@@ -40,7 +40,7 @@ class cartControllers {
 
   //   cart products and calculate
   get_cart_products = async (req, res) => {
-    const commition = 2;
+    const commition = 5;
     const { userId } = req.params;
     try {
       const cart_products = await cartModal.aggregate([
