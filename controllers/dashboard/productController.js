@@ -68,26 +68,25 @@ class productController {
     });
   };
   products_get = async (req, res) => {
-    const { searchValue } = req.query;
+    const { email } = req.query;
     const { id } = req;
+  
     try {
-      if (searchValue) {
-        // If searchValue is provided, perform a text search
+      if (email) {
+        // If email is provided, perform a search based on email
         const products = await productModal.find({
-          $text: { $search: searchValue },
+          email: email, // Filter products by email
           sellerId: id,
         });
-        const totalProduct = await productModal
-          .find({
-            $text: { $search: searchValue },
-            sellerId: id,
-          })
-          .countDocuments();
+  
+        const totalProduct = products.length; // Get the total count of filtered products
+  
         responseReturn(res, 200, { totalProduct, products });
       } else {
-        // If searchValue is not provided, return all products for the seller
-        const products = await productModal.find({});
-        const totalProduct = await productModal.find({}).countDocuments();
+        // If email is not provided, return all products for the seller
+        const products = await productModal.find({ sellerId: id });
+        const totalProduct = products.length; // Get the total count of all products for the seller
+  
         responseReturn(res, 200, { products, totalProduct });
       }
     } catch (error) {
@@ -96,6 +95,7 @@ class productController {
       responseReturn(res, 500, { error: "Internal server error" });
     }
   };
+  
 
   // product get (edit product in sellers )
   product_get = async (req, res) => {

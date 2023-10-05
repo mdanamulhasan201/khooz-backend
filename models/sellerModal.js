@@ -37,12 +37,29 @@ const sellerSchema = new Schema(
       type: String,
       default: "",
     },
+    rating: {
+      type: Number,
+      default: 0,
+    },
     shopInfo: {
       type: Object,
       default: {},
     },
   },
   { timestamps: true }
+);
+
+sellerSchema.index(
+  {
+    name: "text",
+    email: "text",
+  },
+  {
+    weights: {
+      name: 2,
+      email: 5,
+    },
+  }
 );
 
 module.exports = model("seller", sellerSchema);

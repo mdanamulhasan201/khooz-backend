@@ -103,6 +103,18 @@ class authControllers {
     }
   };
 
+  logout = async (req, res) => {
+    try {
+      res.cookie("accessToken", null, {
+        expires: new Date(Date.now()),
+        httpOnly: true,
+      });
+      responseReturn(res, 200, { message: "logout success" });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
   // user info get (authRoutes)
   getUser = async (req, res) => {
     const { id, role } = req; //req theke id and role distructer
@@ -155,19 +167,29 @@ class authControllers {
   };
 
   profile_info_add = async (req, res) => {
-    const { shopName, mobileNumber, division, district, thana, village } =
-      req.body;
+    const {
+      category,
+      shopName,
+      mobileNumber,
+      division,
+      district,
+      thana,
+      village,
+      about,
+    } = req.body;
     const { id } = req;
 
     try {
       await sellerModal.findByIdAndUpdate(id, {
         shopInfo: {
+          category,
           shopName,
           mobileNumber,
           division,
           district,
           thana,
           village,
+          about,
         },
       });
       const userInfo = await sellerModal.findById(id);
