@@ -49,9 +49,10 @@ class sellerController {
       responseReturn(res, 500, { error: error.message });
     }
   };
+
   get_active_seller = async (req, res) => {
     let { searchValue } = req.query;
-    console.log(searchValue);
+
     try {
       if (searchValue) {
         const sellers = await sellerModal.find({
@@ -79,11 +80,49 @@ class sellerController {
         const totalSeller = await sellerModal
           .find({ status: "active" })
           .countDocuments();
-        console.log(sellers);
+
         responseReturn(res, 200, { totalSeller, sellers });
       }
     } catch (error) {
       console.log("active seller get", error.message);
+      // Handle errors appropriately
+    }
+  };
+  get_deactive_seller = async (req, res) => {
+    let { searchValue } = req.query;
+
+    try {
+      if (searchValue) {
+        const sellers = await sellerModal.find({
+          status: "deactive",
+          $or: [
+            { name: { $regex: new RegExp(searchValue, "i") } }, // Case-insensitive search for name
+            { email: { $regex: new RegExp(searchValue, "i") } }, // Case-insensitive search for email
+          ],
+        });
+        // .sort({ createdAt: -1 });
+        const totalSeller = await sellerModal
+          .find({
+            status: "deactive",
+            $or: [
+              { name: { $regex: new RegExp(searchValue, "i") } }, // Case-insensitive search for name
+              { email: { $regex: new RegExp(searchValue, "i") } }, // Case-insensitive search for email
+            ],
+          })
+          .countDocuments();
+        responseReturn(res, 200, { totalSeller, sellers });
+      } else {
+        const sellers = await sellerModal.find({ status: "deactive" });
+        // .sort({ createdAt: -1 });
+
+        const totalSeller = await sellerModal
+          .find({ status: "deactive" })
+          .countDocuments();
+
+        responseReturn(res, 200, { totalSeller, sellers });
+      }
+    } catch (error) {
+      console.log("deactive seller get", error.message);
       // Handle errors appropriately
     }
   };

@@ -56,7 +56,7 @@ sellerSchema.index(
   },
   {
     weights: {
-      name: 2,
+      name: 5,
       email: 5,
     },
   }

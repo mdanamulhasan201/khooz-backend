@@ -78,10 +78,7 @@ class cartControllers {
         cart_product_count = cart_product_count + quantity;
         buy_product_item = buy_product_item + quantity;
         const { price, discount } = stockProduct[i].products[0];
-        if (discount !== 0) {
-          calculatePrice =
-            calculatePrice +
-            quantity * (price - Math.floor((price * discount) / 100));
+        if (discount !== 0) {calculatePrice =calculatePrice + quantity * (price - Math.floor((price * discount) / 100));
         } else {
           calculatePrice = calculatePrice + quantity * price;
         }
