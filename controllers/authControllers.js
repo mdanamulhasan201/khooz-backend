@@ -115,6 +115,7 @@ class authControllers {
     }
   };
 
+
   // user info get (authRoutes)
   getUser = async (req, res) => {
     const { id, role } = req; //req theke id and role distructer

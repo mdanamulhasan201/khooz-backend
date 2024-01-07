@@ -12,4 +12,5 @@ router.post("/profile-image-upload",authMiddleware, authControllers.profile_imag
 router.post("/profile-info-add",authMiddleware, authControllers.profile_info_add);
 router.get('/logout',authMiddleware, authControllers.logout )
 
+
 module.exports = router;

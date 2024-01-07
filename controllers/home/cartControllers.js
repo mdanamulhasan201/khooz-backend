@@ -40,7 +40,7 @@ class cartControllers {
 
   //   cart products and calculate
   get_cart_products = async (req, res) => {
-    const commition = 5;
+    const commition = 2;
     const { userId } = req.params;
     try {
       const cart_products = await cartModal.aggregate([
@@ -63,21 +63,28 @@ class cartControllers {
       let buy_product_item = 0;
       let calculatePrice = 0;
       let cart_product_count = 0;
+
       const outOfStockProducts = cart_products.filter(
-        (p) => p.products[0].stock < p.quantity
+        p => p.products[0].stock < p.quantity
       );
+
       for (let i = 0; i < outOfStockProducts.length; i++) {
         cart_product_count =
           cart_product_count + outOfStockProducts[i].quantity;
       }
       const stockProduct = cart_products.filter(
-        (p) => p.products[0].stock >= p.quantity
+        p => p.products[0].stock >= p.quantity
       );
+
       for (let i = 0; i < stockProduct.length; i++) {
         const { quantity } = stockProduct[i];
+
+
         cart_product_count = cart_product_count + quantity;
         buy_product_item = buy_product_item + quantity;
+
         const { price, discount } = stockProduct[i].products[0];
+
         if (discount !== 0) {calculatePrice =calculatePrice + quantity * (price - Math.floor((price * discount) / 100));
         } else {
           calculatePrice = calculatePrice + quantity * price;
@@ -87,14 +94,18 @@ class cartControllers {
       let p = [];
 
       let unique = [
-        ...new Set(stockProduct.map((p) => p.products[0].sellerId.toString())),
+        ...new Set(stockProduct.map(p => p.products[0].sellerId.toString())),
       ];
       for (let i = 0; i < unique.length; i++) {
         let price = 0;
+
         for (let j = 0; j < stockProduct.length; j++) {
           const tempProducts = stockProduct[j].products[0];
+
           if (unique[i] === tempProducts.sellerId.toString()) {
+
             let pri = 0;
+            
             if (tempProducts.discount !== 0) {
               pri =
                 tempProducts.price -

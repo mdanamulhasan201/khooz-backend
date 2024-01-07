@@ -6,6 +6,8 @@ const {
 } = require("mongoose");
 const { responseReturn } = require("../../utiles/response");
 const cartModal = require("../../models/cartModal");
+const myShopWalletModal = require("../../models/myShopWalletModal");
+const SellerWalletModal = require("../../models/SellerWalletModal");
 const stripe = require("stripe")(
   "sk_test_51O2od3Hytm0jO8z5ka96mMf4lE28k5MhqdCmfkfe1sIbRiXemRgVieQMjpbilZbeOmJTURFmRzTKgMuOD1SGogxt00eiGZz4jp"
 );
@@ -79,7 +81,7 @@ class orderController {
           products: storePro,
           price: pri,
           payment_status: "unpaid",
-          shippingInfo: "admin ware shop house",
+          shippingInfo: "khooz Shop house",
           delivery_status: "pending",
           date: tempDate,
         });
@@ -304,7 +306,7 @@ class orderController {
       });
       responseReturn(res, 200, { message: "order status update success" });
     } catch (error) {
-      console.log("get admin order status error", +error.message);
+      console.log("get admin order status error", + error.message);
       responseReturn(res, 500, { message: "internal server error" });
     }
   };
@@ -320,6 +322,50 @@ class orderController {
         },
       });
       responseReturn(res, 200, { clientSecret: payment.client_secret });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  order_confirm = async (req, res) => {
+    const { orderId } = req.params;
+    try {
+      await customerOrderModal.findByIdAndUpdate(orderId, {
+        payment_status: "paid",
+        delivery_status: "pending",
+      });
+      await adminOrderModal.updateMany(
+        { orderId: new ObjectId(orderId) },
+        {
+          payment_status: "paid",
+          delivery_status: "pending",
+        }
+      );
+      const customerOrder = await customerOrderModal.findById(orderId);
+
+      const adminOrder = await adminOrderModal.find({
+        orderId: new ObjectId(orderId),
+      });
+
+      const time = moment(Date.now()).format("l");
+      const splitTime = time.split("/");
+
+      // admin wallet(shop owner)
+      await myShopWalletModal.create({
+        amount: customerOrder.price,
+        month: splitTime[0],
+        year: splitTime[2],
+      });
+
+      for (let i = 0; i < adminOrder.length; i++) {
+        await SellerWalletModal.create({
+          sellerId: adminOrder[i].sellerId.toString(),
+          amount: adminOrder[i].price,
+          month: splitTime[0],
+          year: splitTime[2],
+        });
+      }
+      responseReturn(res, 200, { message: "success" });
     } catch (error) {
       console.log(error.message);
     }

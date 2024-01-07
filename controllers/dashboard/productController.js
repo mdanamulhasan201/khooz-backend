@@ -1,3 +1,4 @@
+// class base
 const formidable = require("formidable");
 const cloudinary = require("cloudinary").v2;
 const productModal = require("../../models/productModal");

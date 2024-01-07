@@ -52,6 +52,7 @@ io.on("connection", (soc) => {
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use("/api", require("./routes/ChatRoutes"));
+app.use("/api", require("./routes/dashboard/dashboardIndex"));
 app.use("/api", require("./routes/paymentRoute/paymentRoutes"));
 app.use("/api/home", require("./routes/home/homeRoutes"));
 app.use("/api", require("./routes/order/orderRoutes"));
